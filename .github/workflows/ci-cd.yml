@@ -85,7 +85,7 @@ jobs:
       - ci-task-service
       - ci-frontend
     if: github.event_name == 'push'
-    runs-on: [self-hosted, virtualbox-vm]
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
