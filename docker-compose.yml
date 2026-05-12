@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/authdb
+      JWT_SECRET: devsecret123
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+
+  task-service:
+    build:
+      context: ./services/task-service
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/taskdb
+      JWT_SECRET: devsecret123
+      PORT: 3002
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./services/frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - task-service
+
+volumes:
+  mongo-data:

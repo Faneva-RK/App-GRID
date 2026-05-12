@@ -1,0 +1,77 @@
+const Task = require("../models/Task");
+
+const getTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({
+      $or: [{ assignedTo: req.user.id }, { createdBy: req.user.id }],
+    }).sort({ createdAt: -1 });
+
+    res.json({ tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createTask = async (req, res, next) => {
+  try {
+    const { title, description = "", status, priority, project, assignedTo, deadline } = req.body;
+
+    if (!title || !project) {
+      return res.status(400).json({ message: "Task title and project are required" });
+    }
+
+    const task = await Task.create({
+      title,
+      description,
+      status,
+      priority,
+      project,
+      assignedTo: assignedTo || null,
+      createdBy: req.user.id,
+      deadline: deadline || null,
+    });
+
+    res.status(201).json({ task });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateTask = async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ task });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteTask = async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndDelete(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ message: "Task deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTask,
+};
+
