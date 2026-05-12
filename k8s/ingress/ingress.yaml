@@ -4,7 +4,7 @@ metadata:
   name: collab-ingress
   namespace: collab-tasks
 spec:
-  ingressClassName: nginx
+  ingressClassName: gce
   rules:
     - http:
         paths:

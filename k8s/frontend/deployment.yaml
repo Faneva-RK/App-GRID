@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: gcr.io/projet-faneva/frontend:v1
+          image: europe-west1-docker.pkg.dev/projet-faneva/collab-tasks/frontend:v1
           ports:
             - containerPort: 80
           resources:
@@ -25,4 +25,3 @@ spec:
             limits:
               cpu: "200m"
               memory: "256Mi"
-
