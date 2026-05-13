@@ -58,7 +58,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    refreshUser();
+    if (!user && localStorage.getItem("token")) {
+      refreshUser();
+    }
   }, []);
 
   const showNavbar = !["/login", "/register"].includes(location.pathname);
