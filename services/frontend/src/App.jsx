@@ -21,7 +21,12 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const refreshUser = async () => {
+  const refreshUser = async (providedUser = null) => {
+    if (providedUser) {
+      setUser(providedUser);
+      return providedUser;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       setUser(null);
