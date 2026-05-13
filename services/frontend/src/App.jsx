@@ -17,13 +17,21 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch {
+      return null;
+    }
+  });
   const location = useLocation();
   const navigate = useNavigate();
 
   const refreshUser = async (providedUser = null) => {
     if (providedUser) {
       setUser(providedUser);
+      localStorage.setItem("user", JSON.stringify(providedUser));
       return providedUser;
     }
 
@@ -36,9 +44,11 @@ export default function App() {
     try {
       const response = await getMe();
       setUser(response.user);
+      localStorage.setItem("user", JSON.stringify(response.user));
       return response.user;
     } catch (error) {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       setUser(null);
       if (location.pathname !== "/login" && location.pathname !== "/register") {
         navigate("/login", { replace: true });

@@ -17,6 +17,9 @@ export default function Login({ onAuthChange }) {
     try {
       const response = await login(form);
       localStorage.setItem("token", response.token);
+      if (response.user) {
+        localStorage.setItem("user", JSON.stringify(response.user));
+      }
       await onAuthChange?.(response.user);
       navigate("/dashboard", { replace: true });
     } catch (err) {
