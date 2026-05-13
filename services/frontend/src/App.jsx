@@ -69,9 +69,24 @@ export default function App() {
       <Routes>
         <Route
           path="/login"
-          element={<Login onAuthChange={refreshUser} />}
+          element={
+            localStorage.getItem("token") ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login onAuthChange={refreshUser} />
+            )
+          }
         />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={
+            localStorage.getItem("token") ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Register />
+            )
+          }
+        />
         <Route
           path="/dashboard"
           element={

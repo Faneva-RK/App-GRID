@@ -21,7 +21,7 @@ export default function Login({ onAuthChange }) {
         localStorage.setItem("user", JSON.stringify(response.user));
       }
       await onAuthChange?.(response.user);
-      navigate("/dashboard", { replace: true });
+      window.location.assign("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
