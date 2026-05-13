@@ -96,6 +96,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      IMAGE_TAG: ${{ github.sha }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -121,22 +123,22 @@ jobs:
         run: gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" --quiet
 
       - name: Build auth-service image
-        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/auth-service:v1" ./services/auth-service
+        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/auth-service:$IMAGE_TAG" ./services/auth-service
 
       - name: Build task-service image
-        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/task-service:v1" ./services/task-service
+        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/task-service:$IMAGE_TAG" ./services/task-service
 
       - name: Build frontend image
-        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/frontend:v1" ./services/frontend
+        run: docker build -t "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/frontend:$IMAGE_TAG" ./services/frontend
 
       - name: Push auth-service image
-        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/auth-service:v1"
+        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/auth-service:$IMAGE_TAG"
 
       - name: Push task-service image
-        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/task-service:v1"
+        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/task-service:$IMAGE_TAG"
 
       - name: Push frontend image
-        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/frontend:v1"
+        run: docker push "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/frontend:$IMAGE_TAG"
 
       - name: Get GKE credentials
         run: gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
@@ -156,3 +158,9 @@ jobs:
           kubectl apply -f k8s/frontend/service.yaml
           kubectl apply -f k8s/frontend/deployment.yaml
           kubectl apply -f k8s/ingress/ingress.yaml
+          kubectl set image deployment/auth-service auth-service="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/auth-service:$IMAGE_TAG" -n collab-tasks
+          kubectl set image deployment/task-service task-service="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/task-service:$IMAGE_TAG" -n collab-tasks
+          kubectl set image deployment/frontend frontend="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPOSITORY/frontend:$IMAGE_TAG" -n collab-tasks
+          kubectl rollout status deployment/auth-service -n collab-tasks
+          kubectl rollout status deployment/task-service -n collab-tasks
+          kubectl rollout status deployment/frontend -n collab-tasks
