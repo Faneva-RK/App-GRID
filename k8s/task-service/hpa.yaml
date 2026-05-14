@@ -17,3 +17,8 @@ spec:
         target:
           type: Utilization
           averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30  # scale down en 30s au lieu de 5 min
+    scaleUp:
+      stabilizationWindowSeconds: 0   # scale up immédiat
