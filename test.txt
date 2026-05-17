@@ -1,0 +1,6 @@
+sudo apt-get install apache2-utils -y
+TOKEN=$(gcloud auth print-access-token)
+TOKEN=$(curl -s -X POST http://34.49.102.216/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"fanevarakotomalala6@gmail.com","password":"test1234"}' \
+  | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
